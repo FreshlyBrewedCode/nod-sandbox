@@ -51,7 +51,7 @@ export default definePolicy({
       ".nod/**": { tag: "nod-setup", risk: 3 },
       ".github/**": { tag: "ci-config", risk: 3 },
       "docs/**": { tag: "docs", risk: 0 },
-      "**/*.md": { tag: "docs", risk: 0 },
+      "*.md": { tag: "docs", risk: 0 }, // README.md and friends at the root
       // "migrations/**": { tag: "migration", risk: 3 },
       // "src/auth/**": { tag: "auth", risk: 2 },
       // "**/*.test.ts": { tag: "tests", risk: 0 },
