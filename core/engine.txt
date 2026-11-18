@@ -2,7 +2,7 @@ core line 1
 core line 2
 core line 3
 core line 4
-core line 5
+core line 5 (changed by PR B)
 core line 6
 core line 7
 core line 8
