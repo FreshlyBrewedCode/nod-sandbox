@@ -1,0 +1,27 @@
+# ATTACK (spike): can a branch workflow enter environment `nod` (branch policy: main only) or fake a deployment?
+name: env-probe
+on:
+  push:
+    branches: ["attack/**"]
+permissions:
+  deployments: write
+  contents: read
+jobs:
+  enter-env:
+    runs-on: ubuntu-latest
+    environment: nod
+    steps:
+      - run: 'if [ -n "$S" ]; then echo "secret readable (len ${#S})"; else echo "secret empty"; fi'
+        env:
+          S: ${{ secrets.NOD_ENV_PROBE }}
+  fake-deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: create deployment in env nod via REST with GITHUB_TOKEN
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -x
+          id=$(gh api -X POST "repos/${GITHUB_REPOSITORY}/deployments" -f ref="${GITHUB_SHA}" -f environment=nod \
+                 -F auto_merge=false -f 'required_contexts[]' --jq .id) || exit 0
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/deployments/${id}/statuses" -f state=success -f environment=nod
