@@ -1,3 +1,4 @@
+// Prices in cents. Widgets under ten euros are a data error.
 export const catalog = [
   { id: 1, name: "widget 1", cents: 137 },
   { id: 2, name: "widget 2", cents: 174 },
