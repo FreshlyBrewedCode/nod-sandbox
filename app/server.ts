@@ -6,8 +6,10 @@ export function handle(path: string, requestId = crypto.randomUUID()): string {
   return "not found: try /search/<words>";
 }
 
+const started = Date.now();
+
 export function health(): string {
-  return "ok";
+  return `ok, up ${Math.round((Date.now() - started) / 1000)} s`;
 }
 
 export function logSlow(path: string, ms: number): void {
