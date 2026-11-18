@@ -45,16 +45,19 @@ const headSha: string = pr.head.sha;
 const baseRef: string = pr.base.ref;
 const author: string = pr.user.login;
 
-// --- policy (spike): touching core/, .nod/ or .github/ needs a peer; everything else a self nod is enough
-const files = await paginate(`/repos/${repo}/pulls/${prNumber}/files`);
-const needsPeer = files.some((f: any) => PEER_PATHS.some((re) => re.test(f.filename)));
-const requirement = needsPeer ? "peer" : "self";
-
 // --- patch-id: fetch base tip and PR head as data, diff locally with the pinned flags
 const auth = "AUTHORIZATION: basic " + Buffer.from(`x-access-token:${token}`).toString("base64");
 git(".", ["-c", `http.https://github.com/.extraheader=${auth}`, "fetch", "--no-tags", "--quiet", "origin",
   `+refs/heads/${baseRef}:refs/nod/base`, headSha]);
 const local = patchId(".", "refs/nod/base", headSha);
+
+// --- policy (spike): touching core/, .nod/ or .github/ needs a peer; everything else a self nod is enough.
+// The file list comes from git, NOT from the files API: that API stops at 3000 files, so a padded PR
+// could hide a core/ change from the policy (shown on PR #5 of the sandbox).
+const files = git(".", ["diff", "--name-only", "-z", "--no-renames", local.mergeBase, headSha]).split("\0").filter(Boolean);
+const apiFileCount = (await ghJson(`/repos/${repo}/pulls/${prNumber}`)).changed_files;
+const needsPeer = files.some((f) => PEER_PATHS.some((re) => re.test(f)));
+const requirement = needsPeer ? "peer" : "self";
 // for comparison only: the API's diff (capped by GitHub's diff limits)
 let apiPatchId = "", apiDiffStatus = 0;
 {
@@ -101,6 +104,7 @@ const by = valid.map((r) => `${r.reviewer} (${r.kind}, ${r.matched})`).join(", "
 const title = ok ? `nodded by ${by}` : `waiting for a ${requirement} nod` + (valid.length ? ` (have: ${by})` : "");
 const summary = {
   pr: prNumber, head_sha: headSha, base: baseRef, author, requirement, strict_base: STRICT_BASE,
+  files: files.length, api_changed_files: apiFileCount,
   patch_id: local.patchId, merge_base: local.mergeBase, api_patch_id: apiPatchId, api_diff_status: apiDiffStatus,
   event: process.env.GITHUB_EVENT_NAME, run: `${process.env.GITHUB_SERVER_URL}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}`,
   nods: results, verifier_ms: Date.now() - t0,
