@@ -1,0 +1,36 @@
+# nod verifier workflow, spike version. NOT production code.
+name: nod
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited]   # edited: base branch changes
+  issue_comment:
+    types: [created, edited, deleted]
+
+permissions: {}   # nothing at workflow level; the job asks for the minimum
+
+concurrency:
+  group: nod-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: github.event_name == 'pull_request_target' || github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write          # create the `nod` check run on the PR head SHA
+      contents: read         # fetch base + PR commits as data
+      pull-requests: read    # PR metadata, files, diff
+      issues: read           # PR comments live on the issue
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}   # base ref only, never PR code
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+      - name: verify
+        run: bun .nod/verify.ts
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
+          NOD_STRICT_BASE: "0"
