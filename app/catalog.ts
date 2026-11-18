@@ -1203,5 +1203,6 @@ export const catalog = [
 
 /** A widget's price as shown to customers, e.g. "€1.37". */
 export function price(cents: number): string {
-  return `€${(cents / 100).toFixed(2)}`;
+  const euros = `€${(cents / 100).toFixed(2)}`;
+  return cents < 1000 ? `from ${euros}` : euros;
 }
