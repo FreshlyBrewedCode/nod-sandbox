@@ -1,0 +1,14 @@
+{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "widgets",
+      "dependencies": {
+        "zod": "3.23.8",
+      },
+    },
+  },
+  "packages": {
+    "zod": ["zod@3.23.8", "", {}, ""],
+  }
+}

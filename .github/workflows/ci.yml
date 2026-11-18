@@ -1,12 +1,15 @@
-# An ordinary CI workflow that runs PR code (ci.sh from the PR) with the repo's default (read-only) token.
+# An ordinary CI workflow that runs PR code with the repo's default (read-only) token.
+# PRs labelled `needs-qa` also wait for a manual sign-off in environment `qa`.
 name: ci
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled]
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment: ${{ contains(github.event.pull_request.labels.*.name, 'needs-qa') && 'qa' || '' }}
     steps:
       - uses: actions/checkout@v4
       - run: bash ci.sh
-        env:
-          GH_TOKEN: ${{ github.token }}
