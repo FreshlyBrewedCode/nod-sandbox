@@ -1,0 +1,12 @@
+# An ordinary CI workflow that runs PR code (ci.sh from the PR) with the repo's default (read-only) token.
+name: ci
+on:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash ci.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
