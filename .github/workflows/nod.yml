@@ -29,8 +29,8 @@ jobs:
     permissions:
       checks: write # the `nod` check run on the PR head
       contents: read # fetch the base and the PR's commits as data
-      pull-requests: read # the PR itself
-      issues: write # read the comments; the sticky comment and the nod:* labels
+      pull-requests: write # read the PR; write its sticky comment and nod:* labels
+      issues: read # PR comments live on the issue
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
