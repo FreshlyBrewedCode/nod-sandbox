@@ -10,5 +10,5 @@ export function health(): string {
 }
 
 export function logSlow(path: string, ms: number): void {
-  if (ms > 500) console.warn(`slow request ${path}: ${ms} ms`);
+  if (ms > 300) console.warn(`slow request ${path}: ${ms} ms`);
 }
