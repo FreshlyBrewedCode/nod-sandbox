@@ -1,5 +1,5 @@
 {
-  "welcome": "Welcome back",
-  "empty": "Nothing here yet",
-  "save": "Save"
+  "welcome": "Welcome back!",
+  "empty": "Nothing here yet. Add your first widget.",
+  "save": "Save changes"
 }
