@@ -1200,3 +1200,9 @@ export const catalog = [
   { id: 1199, name: "widget 1199", cents: 8463 },
   { id: 1200, name: "widget 1200", cents: 8500 },
 ];
+
+/** A widget's price as shown to customers, e.g. "€1.37". */
+export function price(cents: number): string {
+  const euros = `€${(cents / 100).toFixed(2)}`;
+  return cents < 1000 ? `from ${euros}` : euros;
+}
