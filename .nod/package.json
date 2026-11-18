@@ -1,0 +1,9 @@
+{
+  "name": "nod-verifier",
+  "private": true,
+  "description": "This repository's nod policy and verifier. The kit only provides helpers; the logic is in this folder.",
+  "type": "module",
+  "dependencies": {
+    "@frebreco/nod": "github:FreshlyBrewedCode/nod#5a6fb495d7936dbe15069979607003fab4dc71e5"
+  }
+}

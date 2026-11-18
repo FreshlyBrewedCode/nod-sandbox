@@ -1,0 +1,56 @@
+# The nod verifier. It runs .nod/verify.ts from the DEFAULT branch on every PR
+# event and every PR comment, and sets the required check `nod` on the PR head.
+# It never checks out, installs or runs code from the PR.
+#
+# Hygiene (docs/findings/01 in the nod repo):
+# - nothing at workflow level; the job asks for the minimum
+# - the job is not named `nod`: its own job check would be a green `nod`
+# - ${{ }} only ever expands numbers and fixed strings
+# - third-party actions are pinned by commit SHA
+name: nod
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited] # edited: a base change needs a new verdict
+  issue_comment:
+    types: [created, edited, deleted] # nods arrive as comments
+
+permissions: {}
+
+concurrency:
+  group: nod-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: false # every run reads the full current state; the newest check wins
+
+jobs:
+  verify:
+    if: github.event_name == 'pull_request_target' || github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      checks: write # the `nod` check run on the PR head
+      contents: read # fetch the base and the PR's commits as data
+      pull-requests: read # the PR itself
+      issues: write # read the comments; the sticky comment and the nod:* labels
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.repository.default_branch }} # the default branch only, never PR code
+          fetch-depth: 0 # merge-base needs history
+          persist-credentials: false
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: "1.4.2"
+
+      - name: install the kit (pinned by .nod/bun.lock)
+        working-directory: .nod
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: verify
+        working-directory: .nod
+        run: bun verify.ts
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          # App mode (ADR 0003), later: a token of your own GitHub App, minted in a
+          # job with `environment: nod`, creates the check instead.
+          # NOD_CHECK_TOKEN: ${{ steps.app-token.outputs.token }}
