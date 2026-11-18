@@ -15,7 +15,7 @@ app line 14
 app line 15
 app line 16
 app line 17
-app line 18
+app line 18 (base edits a context line of PR A)
 app line 19
 app line 20
 app line 21
