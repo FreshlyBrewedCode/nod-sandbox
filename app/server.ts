@@ -4,3 +4,7 @@ export function handle(path: string): string {
   if (path.startsWith("/search/")) return `results for ${normalise(path.slice(8))}`;
   return "not found";
 }
+
+export function health(): string {
+  return "ok";
+}
