@@ -33,7 +33,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
-          NOD_STRICT_BASE: "0"
+          NOD_STRICT_BASE: "1"   # an entry only counts for the base branch it was signed against
 
   # spike probe: can the default-branch context (pull_request_target / issue_comment) enter environment `nod`
   # (deployment branch policy: main only) and read its secret? A branch workflow cannot (see attack/forge).
