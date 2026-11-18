@@ -1,0 +1,14 @@
+# Who can nod in this repository: the trust root (nod ADR 0002).
+#
+# One line per key, in OpenSSH's allowed_signers format:
+#   <github-login> namespaces="nod" <key-type> <public-key> [comment]
+# The principal is the GitHub login, exactly as GitHub spells it. A nod by the
+# PR's author counts as "self", a nod by anyone else listed here as "peer".
+#
+# The verifier reads this file from the default branch on every run, so:
+# - adding a key is a PR to this file; it is under .nod/, so a peer must nod it;
+# - removing a key revokes that key's nods on every open PR at the next run;
+# - `valid-after="20270101"` / `valid-before="…"` options help rotate a key.
+
+FreshlyBrewedCode namespaces="nod" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB0uPuYjeqjFaYbbfHWHTgFXuFRYPB97+omk/7Dv1ntr
+bob namespaces="nod" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINL9ivWGTEDNtO8+Gg/AkxA+DU4+uJHFsYElNZtcKP3E
