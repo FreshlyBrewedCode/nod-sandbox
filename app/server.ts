@@ -8,3 +8,7 @@ export function handle(path: string): string {
 export function health(): string {
   return "ok";
 }
+
+export function logSlow(path: string, ms: number): void {
+  if (ms > 500) console.warn(`slow request ${path}: ${ms} ms`);
+}
